@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/vs/drone_hack/docker_ardupilot/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/vs/drone_hack/docker_ardupilot/catkin_ws/install -G Unix Makefiles

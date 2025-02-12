@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/vs/drone_hack/docker_ardupilot/catkin_ws/devel/setup.sh
