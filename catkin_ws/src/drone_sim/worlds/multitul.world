@@ -123,7 +123,7 @@
           </surface>
         </collision>
 
-        <!-- <visual name='outer_walls'>
+        <visual name='outer_walls'>
           <pose frame=''>-8 0 0.015 0 -0 0</pose> 
           <cast_shadows>0</cast_shadows>
           <geometry>
@@ -134,7 +134,7 @@
           <meta>
             <layer>3</layer>
           </meta>
-        </visual> -->
+        </visual>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>

@@ -51,7 +51,6 @@ class DroneMission:
             self.is_check_small_move = False
             self.test_real_flight = True
             self.is_demo_flight_remote = False
-            # self.drone.name = "ASAD_0"
 
         else:
             self.pathname_task_list = "/home/pi/catkin_ws/src/drone/ardupilot_control/task_lists/"
@@ -60,8 +59,9 @@ class DroneMission:
             self.is_check_small_move = rospy.get_param('/is_check_small_move')
             self.test_real_flight = rospy.get_param('/test_real_flight') # works for real and gazebo drones
             self.is_demo_flight_remote = rospy.get_param('/is_demo_flight_remote')
-            # self.drone.name = rospy.get_param('/UAV_name')
+            self.drone.name = rospy.get_param('/UAV_name')
 
+        
         print("UAV_name:", self.drone.name)
 
         " Path for drone in local "

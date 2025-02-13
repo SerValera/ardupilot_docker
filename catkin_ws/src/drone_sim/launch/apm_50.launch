@@ -1,4 +1,8 @@
 <launch>
+    <!-- Load ROS params -->
+    <rosparam command="load" file="$(find drone_sim)/config/drone_race_params.yaml" />
+    
+
 	<!-- vim: set ft=xml noet : -->
 	<!-- example launch script for ArduPilot based FCU's -->
     <arg name="fcu_url" default="udp://127.0.0.1:14550@14551" />
@@ -23,7 +27,7 @@
 	</include>
 
 	<!-- Launch ardupilot control script -->
-	<!-- <node name="drone_sim" pkg="multi_drone_sim" type="mission_drone.py" output="screen">
-    </node> -->
+	<node name="drone_sim" pkg="drone_sim" type="mission_drone.py" output="screen">
+    </node>
 
 </launch>

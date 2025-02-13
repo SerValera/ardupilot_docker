@@ -25,6 +25,7 @@ import time
 class Drone:
     def __init__(self):
         self.id = 0
+        self.name = ''
 
         self.k_vel = 3.0
         self.k_vel_z = 4.0
