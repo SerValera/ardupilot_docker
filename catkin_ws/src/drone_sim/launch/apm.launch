@@ -1,0 +1,12 @@
+<launch>
+
+    <!-- Load ROS params -->
+    <rosparam command="load" file="$(find drone_sim)/config/drone_race_params.yaml" />
+    
+    <!-- AMP0 launch for each vehicle -->
+    <group ns="drone1">
+        <include file="$(find drone_sim)/launch/apm_50.launch">
+        </include>
+    </group>
+
+</launch>

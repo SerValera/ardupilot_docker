@@ -1,5 +1,5 @@
 # generated from catkin/cmake/template/order_packages.context.py.in
-source_root_dir = '/home/vs/drone_hack/docker_ardupilot/catkin_ws/src'
+source_root_dir = '/home/sim/ardupilot_docker/catkin_ws/src'
 whitelisted_packages = ''.split(';') if '' != '' else []
 blacklisted_packages = ''.split(';') if '' != '' else []
-underlay_workspaces = '/home/vs/ardupilot_sim_ws/devel;/home/vs/omnirace_ws/devel;/home/vs/rs_ws/devel;/home/vs/drone_ai_pilot_ws/devel;/home/vs/crazyswarm/ros_ws/devel;/home/vs/pencil_ws/devel;/home/vs/good_vicon/devel;/home/vs/ai_pilot_ws/devel;/home/vs/svo_ws/devel;/home/vs/perception_ws/devel;/home/vs/multi_tool_ws/devel;/home/vs/overtake_ws/devel;/home/vs/ardupilot_ws/devel;/opt/ros/noetic'.split(';') if '/home/vs/ardupilot_sim_ws/devel;/home/vs/omnirace_ws/devel;/home/vs/rs_ws/devel;/home/vs/drone_ai_pilot_ws/devel;/home/vs/crazyswarm/ros_ws/devel;/home/vs/pencil_ws/devel;/home/vs/good_vicon/devel;/home/vs/ai_pilot_ws/devel;/home/vs/svo_ws/devel;/home/vs/perception_ws/devel;/home/vs/multi_tool_ws/devel;/home/vs/overtake_ws/devel;/home/vs/ardupilot_ws/devel;/opt/ros/noetic' != '' else []
+underlay_workspaces = '/home/sim/ardupilot_docker/catkin_ws/devel;/opt/ros/noetic'.split(';') if '/home/sim/ardupilot_docker/catkin_ws/devel;/opt/ros/noetic' != '' else []

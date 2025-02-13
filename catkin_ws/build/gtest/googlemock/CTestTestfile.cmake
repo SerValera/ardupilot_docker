@@ -1,6 +1,6 @@
 # CMake generated Testfile for 
 # Source directory: /usr/src/googletest/googlemock
-# Build directory: /home/vs/drone_hack/docker_ardupilot/catkin_ws/build/gtest/googlemock
+# Build directory: /home/sim/ardupilot_docker/catkin_ws/build/gtest/googlemock
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.

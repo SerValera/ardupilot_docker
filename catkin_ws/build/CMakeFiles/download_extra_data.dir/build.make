@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/vs/drone_hack/docker_ardupilot/catkin_ws/src
+CMAKE_SOURCE_DIR = /home/sim/ardupilot_docker/catkin_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/vs/drone_hack/docker_ardupilot/catkin_ws/build
+CMAKE_BINARY_DIR = /home/sim/ardupilot_docker/catkin_ws/build
 
 # Utility rule file for download_extra_data.
 
@@ -67,6 +67,6 @@ CMakeFiles/download_extra_data.dir/clean:
 .PHONY : CMakeFiles/download_extra_data.dir/clean
 
 CMakeFiles/download_extra_data.dir/depend:
-	cd /home/vs/drone_hack/docker_ardupilot/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/vs/drone_hack/docker_ardupilot/catkin_ws/src /home/vs/drone_hack/docker_ardupilot/catkin_ws/src /home/vs/drone_hack/docker_ardupilot/catkin_ws/build /home/vs/drone_hack/docker_ardupilot/catkin_ws/build /home/vs/drone_hack/docker_ardupilot/catkin_ws/build/CMakeFiles/download_extra_data.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/sim/ardupilot_docker/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/sim/ardupilot_docker/catkin_ws/src /home/sim/ardupilot_docker/catkin_ws/src /home/sim/ardupilot_docker/catkin_ws/build /home/sim/ardupilot_docker/catkin_ws/build /home/sim/ardupilot_docker/catkin_ws/build/CMakeFiles/download_extra_data.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/download_extra_data.dir/depend
 

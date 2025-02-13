@@ -25,6 +25,7 @@ RUN apt-get update \
     gstreamer1.0-gl \
     iputils-ping \
     nano \
+    ros-noetic-rviz \
     ros-noetic-mavros \
     ros-noetic-mavros-extras \
     ros-noetic-gazebo-ros-pkgs \
@@ -37,7 +38,7 @@ RUN apt-get update \
     python3-lxml \
     python3-pygame \
   && rm -rf /var/lib/apt/lists/*
-
+  
 # Python deps
 RUN sudo pip install PyYAML MAVProxy
 
@@ -50,14 +51,19 @@ USER $UNAME
 
 # ROS vars
 RUN echo "source /opt/ros/noetic/setup.bash --extend" >> ~/.bashrc && \
-    echo "source /home/sim/docker_ardupilot/catkin_ws/devel/setup.bash --extend" >> ~/.bashrc && \
+    echo "source /home/sim/ardupilot_docker/catkin_ws/devel/setup.bash --extend" >> ~/.bashrc && \
     echo "source /home/sim/ardupilot/Tools/completion/completion.bash --extend" >> ~/.bashrc && \
-    echo "source /usr/share/gazebo-11/setup.bash --extend" >> ~/.bashrc && \
-    echo "export PATH="/usr/bin:$PATH"" >> ~/.bashrc && \
-    echo "export PATH=$PATH:$HOME/ardupilot/Tools/autotest" >> ~/.bashrc && \
-    echo "export PATH=/usr/lib/ccache:$PATH >>" ~/.bashrc && \
-    echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/usr/share/gazebo-11/models" >> ~/.bashrc && \
-    echo "export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/usr/share/gazebo-11/worlds" >> ~/.bashrc 
+    echo "source /usr/share/gazebo-11/setup.bash --extend" >> ~/.bashrc
+
+# RUN echo "source /opt/ros/noetic/setup.bash --extend" >> ~/.bashrc && \
+#     echo "source /home/sim/ardupilot_docker/catkin_ws/devel/setup.bash --extend" >> ~/.bashrc && \
+#     echo "source /home/sim/ardupilot/Tools/completion/completion.bash --extend" >> ~/.bashrc && \
+#     echo "source /usr/share/gazebo-11/setup.bash --extend" >> ~/.bashrc && \
+#     echo "export PATH="/usr/bin:$PATH"" >> ~/.bashrc && \
+#     echo "export PATH=$PATH:$HOME/ardupilot/Tools/autotest" >> ~/.bashrc && \
+#     echo "export PATH=/usr/lib/ccache:$PATH >>" ~/.bashrc && \
+#     echo "export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/usr/share/gazebo-11/models" >> ~/.bashrc && \
+#     echo "export GAZEBO_RESOURCE_PATH=$GAZEBO_RESOURCE_PATH:/usr/share/gazebo-11/worlds" >> ~/.bashrc 
     
 # Nvidia GPU vars
 ENV NVIDIA_VISIBLE_DEVICES=all
@@ -76,6 +82,8 @@ RUN sudo usermod -a -G dialout $UNAME
 
 WORKDIR $HOME
 RUN git clone https://github.com/ArduPilot/ardupilot.git
-
 RUN echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
 
+# Add terminal commands
+RUN echo "alias copy_realsense_plugin='sudo cp /home/sim/ardupilot_docker/gazebo-realsense/gzrs/RealSensePlugin.hh /usr/include/gazebo-11/gazebo/plugins/'" >> ~/.bashrc
+  

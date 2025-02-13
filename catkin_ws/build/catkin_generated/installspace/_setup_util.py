@@ -268,7 +268,7 @@ if __name__ == '__main__':
 
         if not args.local:
             # environment at generation time
-            CMAKE_PREFIX_PATH = r'/home/vs/ardupilot_sim_ws/devel;/home/vs/omnirace_ws/devel;/home/vs/rs_ws/devel;/home/vs/drone_ai_pilot_ws/devel;/home/vs/crazyswarm/ros_ws/devel;/home/vs/pencil_ws/devel;/home/vs/good_vicon/devel;/home/vs/ai_pilot_ws/devel;/home/vs/svo_ws/devel;/home/vs/perception_ws/devel;/home/vs/multi_tool_ws/devel;/home/vs/overtake_ws/devel;/home/vs/ardupilot_ws/devel;/opt/ros/noetic'.split(';')
+            CMAKE_PREFIX_PATH = r'/home/sim/ardupilot_docker/catkin_ws/devel;/opt/ros/noetic'.split(';')
         else:
             # don't consider any other prefix path than this one
             CMAKE_PREFIX_PATH = []

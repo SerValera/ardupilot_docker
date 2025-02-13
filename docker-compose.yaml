@@ -16,8 +16,6 @@ services:
             - "/dev/fuse:/dev/fuse:rwm"
         cap_add:
             - SYS_ADMIN
-        # networks: 
-        #     - px4docker
         volumes:
             - "/tmp/.X11-unix:/tmp/.X11-unix"
             - ~/.Xauthority:/home/sim/.Xauthority
