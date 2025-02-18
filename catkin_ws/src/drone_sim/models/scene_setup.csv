@@ -1,0 +1,7 @@
+setup,model_name,x,y,z,roll,pitch,yaw
+setup1,isr_gate_1,5,-5,0,0,0,1.57
+setup1,isr_gate_2,5,0,0,0,0,1.57
+setup1,isr_gate_3,5,5,0,0,0,1.57
+setup2,isr_gate_1,5,5,0,0,0,1.57
+setup2,isr_gate_2,5,0,0,0,0,1.57
+setup2,isr_gate_3,5,-5,0,0,0,1.57

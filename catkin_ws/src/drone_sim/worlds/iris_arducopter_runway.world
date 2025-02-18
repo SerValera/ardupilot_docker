@@ -24,84 +24,10 @@
       <!--<max_step_size>0.0020</max_step_size>-->
     </physics>
     <gravity>0 0 -9.8</gravity>
+    
     <include>
       <uri>model://sun</uri>
     </include>
-
-
-    <model name='carpet'>
-      <static>1</static>
-      <pose frame=''>0 0 0 0 0 0</pose>
-      <link name='carpet'>
-        <visual name='carpet_visual'>
-          <geometry>
-            <mesh>
-              <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/carpet/carpet.dae</uri>
-            </mesh>
-          </geometry>
-        </visual>
-        <collision name='gate_collision_1'>
-          <geometry>
-            <mesh>
-              <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/carpet/carpet.dae</uri>
-            </mesh>
-          </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-    </model>
-
-    <model name='drone_race_sk_gate_1'>
-      <static>1</static>
-      <pose frame=''>5 5 0 0 0 1.57</pose>
-      <link name='drone_race_sk_gate_1'>
-        <visual name='gate'>
-          <geometry>
-            <mesh>
-              <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/irs_gates/skoltech_gate_2.dae</uri>
-            </mesh>
-          </geometry>
-        </visual>
-        <collision name='gate_collision_1'>
-          <geometry>
-            <mesh>
-              <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/irs_gates/skoltech_gate_2.dae</uri>
-            </mesh>
-          </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-    </model>
 
     <model name='ground_plane'>
       <static>1</static>
@@ -151,64 +77,13 @@
       </link>
     </model>
 
-
-    <model name='cyberzoo_model'>
-      <static>1</static>
-      <pose frame=''>0 0 0.015 0 -0 0</pose>      
-      <link name='cyberzoo_link'>
-        <!-- <visual name='floor'>
-          <pose frame=''>-5 -5 0.025 0 -0 0</pose>
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>model://cyberzoo/cyberzoo_floor.dae</uri>
-            </mesh>
-          </geometry>
-        </visual> -->
-        <collision name='floor_collision'>
-          <pose frame=''>0 0 0 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10 10 0.02</size>
-            </box>
-          </geometry>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-
-        <visual name='outer_walls'>
-          <pose frame=''>-8 0 0.015 0 -0 0</pose> 
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <mesh>
-              <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/cyberzoo/cyberzoo_walls.dae</uri>
-            </mesh>
-          </geometry>
-          <meta>
-            <layer>3</layer>
-          </meta>
-        </visual>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-    </model>
-
+    <!-- Drone for flight -->
     <model name="iris_demo">
+      <static>true</static>
       <include>
-        <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/iris_with_ardupilot</uri>
+        <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/iris_camera</uri>
       </include>
     </model>
+
   </world>
 </sdf>
