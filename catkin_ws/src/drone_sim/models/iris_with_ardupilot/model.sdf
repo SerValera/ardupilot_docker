@@ -37,7 +37,7 @@
       </inertial>
 
       <sensor type="depth" name="camera1">
-        <update_rate>60</update_rate>
+        <update_rate>120</update_rate>
         <camera name="head">
           <!-- TODO(lucasw) is noise used? -->
           <noise>
