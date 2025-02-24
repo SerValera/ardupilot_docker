@@ -32,4 +32,7 @@ roslaunch drone_sim apm_50.launch
 rm -rf ~/.ros
 ```
 
-[Go back to docker preporation](0_docker.md)
+[Next: Data Organization Structure](2_data_sctructure.md)
+
+
+[Back: Go back to docker preporation](0_docker.md)

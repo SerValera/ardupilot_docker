@@ -53,6 +53,7 @@
     required="$(arg gui_required)"/>
   </group>
 
+  <!-- Load ROS params -->
+  <rosparam command="load" file="/home/sim/ardupilot_docker/config.yaml" />
   
-
 </launch>

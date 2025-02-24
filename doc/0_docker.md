@@ -1,4 +1,4 @@
-# Docker manual
+# 0 - Docker manual
 
 ### 1. Clone repository
 ```bash

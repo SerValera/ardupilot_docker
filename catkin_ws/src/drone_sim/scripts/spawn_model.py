@@ -3,18 +3,27 @@
 import rospy
 import csv
 import os
+import json
+import re
 from gazebo_msgs.srv import SpawnModel, DeleteModel
 from geometry_msgs.msg import Pose
-import tf.transformations as tf
 
 from gazebo_msgs.srv import GetModelState, SetModelState
 from gazebo_msgs.msg import ModelState
 import tf.transformations as tf
 
 from camera_move import SpawnerCamera
+from gates_move import SpawnerGates
 
-SDF_PATH = "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/"
-CSV_FILE = "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/scene_setup.csv"
+
+# TO FILL BY USER
+DATA_SET_TO_RECORD_PATH = rospy.get_param('/DATA_SET_TO_RECORD_PATH')
+CATEGORY = rospy.get_param('/CATEGORY')
+TYPE = rospy.get_param('/TYPE')
+# ---------------
+
+MODELS_PATH = "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models"
+CSV_FILE = "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/objects_tasks/scene_setup.csv"
 
 class SpawnerModels:
     def __init__(self):
@@ -22,6 +31,46 @@ class SpawnerModels:
 
         self.init_pose = [-1, 0, 0.75]
         self.goal_points = []
+        self.json_data = None
+
+        self.scene_setup_csv = None
+        self.setup_gates = []
+        self.setup_labels = []
+
+        self.read_setup_scene()
+
+    def read_setup_scene(self):
+        self.setup_gates = []
+        with open(CSV_FILE, "r") as file:
+            reader = csv.DictReader(file)
+            self.scene_setup_csv = reader
+            for row in reader:
+                if row["model_name"] == "gate":
+                    model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
+                    self.setup_gates.append([id, x, y, z, roll, pitch, yaw])
+                if row["model_name"] == "label":
+                    model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
+                    self.setup_labels.append([id, x, y, z, roll, pitch, yaw])
+
+    def replace_uri_path(self, file_path, path_to_model, dae_files, i) -> None:
+        """
+        Читает XML из файла, заменяет путь внутри тегов <uri> на новый путь и обновляет файл.
+        
+        :param file_path: Путь к XML файлу.
+        :param new_path: Новый путь, который нужно вставить в <uri>.
+        """
+        with open(path_to_model, "r", encoding="utf-8") as file:
+            xml_text = file.read()
+        
+        updated_xml = re.sub(r'(<uri>).*?(</uri>)', rf'\1{file_path + dae_files}\2', xml_text)
+        
+        with open(path_to_model, "w", encoding="utf-8") as file:
+            file.write(updated_xml)
+
+
+    def update_sdf_file(self, file_path, dae_files, path_to_models):
+        for i in range(len(path_to_models)):
+            self.replace_uri_path(file_path, path_to_models[i], dae_files[i], i+1)
 
 
     def delete_existing_models(self):
@@ -37,7 +86,7 @@ class SpawnerModels:
                 rospy.logwarn(f"Failed to delete {model}: {e}")
 
     def spawn_label(self, model_name, x, y, z):
-        model_sdf_file = os.path.join(SDF_PATH, "label", "model.sdf")
+        model_sdf_file = os.path.join(MODELS_PATH, "label", "model.sdf")
         if not os.path.exists(model_sdf_file):
             rospy.logerr(f"Model SDF not found: {model_sdf_file}")
             return
@@ -57,7 +106,34 @@ class SpawnerModels:
         except rospy.ServiceException as e:
             rospy.logerr(f"Failed to spawn {name}: {e}")
 
+    def read_json_file(self, cat, type):
 
+        file_path = DATA_SET_TO_RECORD_PATH + "/" + cat + "/" + type + ".json"
+
+        def extract_all_data(data):
+            """Extracts and stores all data for each prompt."""
+            extracted_data = []
+            for item in data:
+                gates_info = [
+                    {"gate": gate_key, **gate_value}
+                    for gate_key, gate_value in item.get("gates", {}).items()
+                ]
+                extracted_data.append({
+                    "prompt": item["prompt"],
+                    "options": item["options"],
+                    "correct": item["correct"],
+                    "gates": gates_info,
+                    "background": item["background"]
+                })
+            return extracted_data
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+                self.json_data = extract_all_data(data)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error reading JSON file: {e}")
+            return None
+        
     def rotate_model(self, id, model_name, roll, pitch, yaw):
         gazebo_model_name = model_name + "_" + str(id)
         rospy.wait_for_service('/gazebo/get_model_state')
@@ -85,7 +161,7 @@ class SpawnerModels:
             print("Service call failed:", e)
 
     def spawn_model(self, id, model_name, x, y, z):
-        model_sdf_file = os.path.join(SDF_PATH, model_name, "model.sdf")
+        model_sdf_file = os.path.join(MODELS_PATH, model_name, "model.sdf")
         
         if not os.path.exists(model_sdf_file):
             rospy.logerr(f"Model SDF not found: {model_sdf_file}")
@@ -98,7 +174,7 @@ class SpawnerModels:
         pose.position.y = y
         pose.position.z = z
         rospy.wait_for_service("/gazebo/spawn_sdf_model")
-        gazebo_model_name = model_name + "_" + str(id)
+        gazebo_model_name = model_name
         try:
             spawn_service = rospy.ServiceProxy("/gazebo/spawn_sdf_model", SpawnModel)
             spawn_service(gazebo_model_name, model_xml, "", pose, "world")
@@ -108,9 +184,61 @@ class SpawnerModels:
         except rospy.ServiceException as e:
             rospy.logerr(f"Failed to spawn {gazebo_model_name}: {e}")
 
-    def load_scene(self, setup_name):
-        """ Reads the CSV file and spawns models for a specific setup """
-        rospy.init_node('spawn_scene', anonymous=True)
+    def recording_json(self, CGates, CCamera, cat, type):
+        # Read json with dataset discription, for particula Category and Type
+        self.read_json_file(cat, type)
+
+        for setup in self.json_data:
+            objects_poses = []
+
+            # Uptade gates
+            print("prompt", setup["prompt"])
+            for gate in setup["gates"]:
+                id = int(gate["gate"]) - 1
+
+                if id + 1 == int(setup["correct"]):
+                    objects_poses.append([self.setup_gates[id][1], self.setup_gates[id][2]])
+                    
+                CGates.move_gate_by_attributes(id, gate["size"], gate["color"], gate["shape"], self.setup_gates[id][1], self.setup_gates[id][2], self.setup_gates[id][3], self.setup_gates[id][4], self.setup_gates[id][5], self.setup_gates[id][6])
+                rospy.sleep(0.1)
+
+            # Update SDF labels for new task
+            path_to_models = [
+                "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/label_1/model.sdf",
+                "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/label_2/model.sdf",
+                "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/label_3/model.sdf",
+            ]
+            path_to_files = DATA_SET_TO_RECORD_PATH + "/" + cat + "/" + type + "/"
+            self.update_sdf_file(path_to_files, setup["options"], path_to_models)
+
+            # Spawn models in gazebo, remove previous
+            rospy.sleep(0.2)
+            self.load_lables()
+            rospy.sleep(0.05)
+
+            # Move camera and record
+            CCamera.goal_poses = objects_poses
+            CCamera.move_camera(cat, type, setup)
+
+            # Move gate to its init poses
+            CGates.move_gate_back()
+
+        self.delete_existing_models()  # Clear previous scene
+
+    def load_lables(self):
+        self.delete_existing_models()  # Clear previous scene
+
+        with open(CSV_FILE, "r") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["model_name"] == "label":
+                    model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
+                    self.spawn_model(id, model_name + "_" + row["id"], x, y, z)
+                    rospy.sleep(0.2)
+                    self.rotate_model(id, model_name, roll, pitch, yaw)
+
+
+    def load_scene(self, setup_name, gates):
         self.delete_existing_models()  # Clear previous scene
 
         with open(CSV_FILE, "r") as file:
@@ -121,7 +249,6 @@ class SpawnerModels:
                     model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
                     if model_name != "label":
                         objects_poses.append([x, y])
-                    print("model_name", model_name)
                     self.spawn_model(id, model_name, x, y, z)
                     rospy.sleep(0.1)
                     self.rotate_model(id, model_name, roll, pitch, yaw)
@@ -131,16 +258,14 @@ class SpawnerModels:
 if __name__ == "__main__":
     rospy.init_node('spawn_scene', anonymous=True)
 
+    # Prepare scene and gazebo
     spawn = SpawnerModels()
-    camera = SpawnerCamera(init_point=spawn.init_pose)
+    Ccamera = SpawnerCamera(init_point=spawn.init_pose)
+    CGates = SpawnerGates(path=MODELS_PATH, pose=[-5, 5])
 
-    while not rospy.is_shutdown():
-        scene_name = input("Enter setup name (or 'exit' to quit): ").strip()
-        if scene_name.lower() == 'exit':
-            spawn.delete_existing_models()
-            rospy.loginfo("Exiting script...")
-            break
-        objects_poses = spawn.load_scene(scene_name)
+    # Read task list (jsons) for data recording
+    spawn.recording_json(CGates, Ccamera, CATEGORY, TYPE)
 
-        camera.goal_poses = objects_poses
-        camera.move_camera()
+
+
+    

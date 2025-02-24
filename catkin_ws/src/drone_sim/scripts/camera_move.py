@@ -12,6 +12,8 @@ from cv_bridge import CvBridge, CvBridgeError
 import csv
 from datetime import datetime
 import os
+import json
+
 
 class SpawnerCamera:
     def __init__(self, init_point = [0,0,0], goal_pooints=[]):
@@ -69,17 +71,21 @@ class SpawnerCamera:
         state_msg.pose.position.z = self.init_pose[2]
         self.set_state(state_msg)
 
-    def init_folders_to_store_data(self):
-        self.folder = "/home/sim/ardupilot_docker/dataset/" +str(datetime.now()) + "/"
+    def init_folders_to_store_data(self, CATEGORY, TYPE, setup):
+        self.folder = "/home/sim/ardupilot_docker/recorded_dataset/" + CATEGORY + "/" + TYPE + "/" + str(datetime.now()) + "/"
         self.create_folder()
         with open(self.folder + "data.csv", 'w', newline='') as self.writer_file:
             self.writer_csv = csv.writer(self.writer_file)
             self.writer_csv.writerow(['frame_id', 'dx', 'dy', 'dz','angle', 'x', 'y', 'z', 'qx', 'qy', 'qz', 'qw'])
 
-    def move_camera(self): 
+        # Save to JSON file
+        with open(self.folder + "setup.json", 'w') as json_file:
+            json.dump(setup, json_file, indent=4)
+
+    def move_camera(self, CATEGORY, TYPE, setup): 
         for goal_pose in self.goal_poses:
 
-            self.init_folders_to_store_data()
+            self.init_folders_to_store_data(CATEGORY, TYPE, setup)
             self.frame_id = 0
 
             self.init_pose_rand[0] = self.init_pose[0] + random.uniform(-self.init_noised_distance, self.init_noised_distance)
@@ -93,8 +99,8 @@ class SpawnerCamera:
             z_vals = np.linspace(self.init_pose_rand[2], self.fixed_z, len(x_vals))
 
             # Диапазоны шума
-            position_noise_range = 0.001  # Максимальный шум для позиции (0.2 м)
-            orientation_noise_range = 0.005  # Максимальный шум для ориентации (0.1 рад)
+            position_noise_range = 0.0  # Максимальный шум для позиции (0.2 м)
+            orientation_noise_range = 0.0  # Максимальный шум для ориентации (0.1 рад)
 
             # Начинаем движение по траектории
             for i in range(len(x_vals)-1):
@@ -143,7 +149,7 @@ class SpawnerCamera:
                     # Save images
                     self.save_image('image_'+str(self.frame_id)+'.jpg')
 
-                rospy.sleep(0.02)  # Пауза между шагами
+                rospy.sleep(0.01)  # Пауза между шагами
                 self.frame_id += 1
 
             rospy.loginfo("Model reached goal position.")

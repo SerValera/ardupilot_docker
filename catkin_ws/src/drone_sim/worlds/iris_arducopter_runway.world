@@ -21,7 +21,7 @@
         </constraints>
       </ode>
       <real_time_update_rate>-1</real_time_update_rate>
-      <!--<max_step_size>0.0020</max_step_size>-->
+      <max_step_size>0.00002</max_step_size>
     </physics>
     <gravity>0 0 -9.8</gravity>
     
@@ -84,6 +84,32 @@
         <uri>/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/iris_camera</uri>
       </include>
     </model>
+
+    <light name="point_light" type="point">
+    <pose>0 -2 1 0 0 0</pose>
+    <diffuse>0.5 0.5 0.5 1</diffuse>
+    <specular>0.2 0.2 0.2 1</specular>
+    <attenuation>
+      <range>20</range>
+      <constant>0.5</constant>
+      <linear>0.01</linear>
+      <quadratic>0.0</quadratic>
+    </attenuation>
+    <cast_shadows>true</cast_shadows>
+  </light>
+
+      <light name="point_light_2" type="point">
+    <pose>0 2 1 0 0 0</pose>
+    <diffuse>0.5 0.5 0.5 1</diffuse>
+    <specular>0.2 0.2 0.2 1</specular>
+    <attenuation>
+      <range>20</range>
+      <constant>0.5</constant>
+      <linear>0.01</linear>
+      <quadratic>0.0</quadratic>
+    </attenuation>
+    <cast_shadows>true</cast_shadows>
+  </light>
 
   </world>
 </sdf>
