@@ -2,7 +2,7 @@
 
 
 #### Go to file *home/vs/ardupilot_docker/config.yaml*. 
-Choose the Category and Type of the task for recrding. 
+Choose the Category and Type (json file name in Category folder) of the task for recrding. 
 
 ``` bash
 CATEGORY: "Reasoning"
