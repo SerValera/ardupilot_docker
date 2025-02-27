@@ -47,6 +47,9 @@ docker exec -it ardupilot bash
 
 ### 6. In docker, run ONCE for ardupilot.
 ``` bash
+cd ardupilot_docker
+git clone https://github.com/intel/gazebo-realsense
+cd 
 copy_realsense_plugin
 cd ardupilot
 Tools/environment_install/install-prereqs-ubuntu.sh -y
@@ -62,6 +65,7 @@ wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
 
 ### 7. In docker. Plugin installation:
 ``` bash
+cd
 git clone https://github.com/khancyr/ardupilot_gazebo
 cd ardupilot_gazebo
 mkdir build
