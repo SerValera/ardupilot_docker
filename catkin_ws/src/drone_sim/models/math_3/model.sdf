@@ -7,16 +7,16 @@
       <visual name='vis_label'>
         <geometry>
           <mesh>
-            <uri>/home/sim/ardupilot_docker/droneVLA_dataset/Reasoning/math_desk/nine.dae</uri>
-            <scale>2 2 2</scale>
+            <uri>/home/sim/ardupilot_docker/math/1.dae</uri>
+            <scale>1 1 1</scale>
           </mesh>
         </geometry>
       </visual>
       <collision name='col_label'>
         <geometry>
           <mesh>
-            <uri>/home/sim/ardupilot_docker/droneVLA_dataset/Reasoning/math_desk/nine.dae</uri>
-            <scale>2 2 2</scale>
+            <uri>/home/sim/ardupilot_docker/math/1.dae</uri>
+            <scale>1 1 1</scale>
           </mesh>
         </geometry>
         <max_contacts>10</max_contacts>

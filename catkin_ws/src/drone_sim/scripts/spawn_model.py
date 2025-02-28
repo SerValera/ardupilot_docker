@@ -20,10 +20,12 @@ from gates_move import SpawnerGates
 DATA_SET_TO_RECORD_PATH = rospy.get_param('/DATA_SET_TO_RECORD_PATH')
 CATEGORY = rospy.get_param('/CATEGORY')
 TYPE = rospy.get_param('/TYPE')
+IS_MATH = rospy.get_param('/IS_MATH')
 # ---------------
 
 MODELS_PATH = "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models"
 CSV_FILE = "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/objects_tasks/scene_setup.csv"
+BACKGROUND_PATH = "/home/sim/ardupilot_docker/droneVLA_dataset/Backgrounds"
 
 class SpawnerModels:
     def __init__(self):
@@ -74,6 +76,10 @@ class SpawnerModels:
         for i in range(len(path_to_models)):
             self.replace_uri_path(file_path, path_to_models[i], dae_files[i], i+1)
 
+    def update_sdf_math_file(self, file_path, dae_files, path_to_models):
+        file_names_math = [dae_files['d1'], dae_files['operator'], dae_files['d2']]
+        for i in range(len(path_to_models)):
+            self.replace_uri_path(file_path, path_to_models[i], str(file_names_math[i])+".dae", i+1)
 
     def delete_existing_models(self):
         rospy.wait_for_service("/gazebo/delete_model")
@@ -124,6 +130,7 @@ class SpawnerModels:
                 ]
                 extracted_data.append({
                     "prompt": item["prompt"],
+                    "task": item["task"],
                     "prompt_simpler": item["prompt_simpler"],
                     "options": item["options"],
                     "correct": item["correct"],
@@ -222,14 +229,38 @@ class SpawnerModels:
             self.load_lables()
             rospy.sleep(0.1)
 
+            print(setup)
+            print(setup["task"])
+            if IS_MATH:
+                path_to_math_models = [
+                    "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/math_1/model.sdf",
+                    "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/math_2/model.sdf",
+                    "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/math_3/model.sdf",
+                ]
+                path_to_files = "/home/sim/ardupilot_docker/math/"
+                self.update_sdf_math_file(path_to_files, setup["task"], path_to_math_models)
+
+                        # Spawn models in gazebo, remove previous
+            rospy.sleep(0.25)
+            self.load_math()
+            rospy.sleep(0.1)
+
             # Move camera and record
             CCamera.goal_poses = objects_poses
+            
             CCamera.move_camera(cat, type, setup)
+
+            # for background in CGates.initial_poses:
+            #     CGates.move_model_to_pose(str(background), 7, 0, 5)
+            #     rospy.sleep(0.05)
+            #     CCamera.move_camera(cat, type, setup)
+            #     CGates.move_model_to_pose(str(background), 10, 0, -10)
+            #     rospy.sleep(0.05)
 
             # Move gate to its init poses
             CGates.move_gate_back()
 
-            self.count += 1
+        self.count += 1
 
         self.delete_existing_models()  # Clear previous scene
 
@@ -240,6 +271,16 @@ class SpawnerModels:
             reader = csv.DictReader(file)
             for row in reader:
                 if row["model_name"] == "label":
+                    model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
+                    self.spawn_model(id, model_name + "_" + row["id"], x, y, z)
+                    rospy.sleep(0.25)
+                    self.rotate_model(id, model_name, roll, pitch, yaw)
+
+    def load_math(self):
+        with open(CSV_FILE, "r") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row["model_name"] == "math":
                     model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
                     self.spawn_model(id, model_name + "_" + row["id"], x, y, z)
                     rospy.sleep(0.25)
@@ -269,7 +310,7 @@ if __name__ == "__main__":
     # Prepare scene and gazebo
     spawn = SpawnerModels()
     Ccamera = SpawnerCamera(init_point=spawn.init_pose)
-    CGates = SpawnerGates(path=MODELS_PATH, pose=[-5, 5])
+    CGates = SpawnerGates(path=MODELS_PATH, bg_path=BACKGROUND_PATH, pose=[-5, 5])
 
     # Read task list (jsons) for data recording
     spawn.recording_json(CGates, Ccamera, CATEGORY, TYPE)

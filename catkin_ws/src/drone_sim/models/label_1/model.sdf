@@ -7,7 +7,7 @@
       <visual name='vis_label'>
         <geometry>
           <mesh>
-            <uri>/home/sim/ardupilot_docker/droneVLA_dataset/Reasoning/Digits/three.dae</uri>
+            <uri>/home/sim/ardupilot_docker/droneVLA_dataset/Reasoning/math_desk/eight.dae</uri>
             <scale>2 2 2</scale>
           </mesh>
         </geometry>
@@ -15,7 +15,7 @@
       <collision name='col_label'>
         <geometry>
           <mesh>
-            <uri>/home/sim/ardupilot_docker/droneVLA_dataset/Reasoning/Digits/three.dae</uri>
+            <uri>/home/sim/ardupilot_docker/droneVLA_dataset/Reasoning/math_desk/eight.dae</uri>
             <scale>2 2 2</scale>
           </mesh>
         </geometry>

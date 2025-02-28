@@ -228,7 +228,7 @@ class SpawnerCamera:
                     # Save images
                     self.save_image('image_'+str(self.frame_id)+'.jpg')
 
-                rospy.sleep(0.01)  # Пауза между шагами
+                rospy.sleep(0.0075)  # Пауза между шагами
                 self.frame_id += 1
 
             rospy.loginfo("Model reached goal position.")

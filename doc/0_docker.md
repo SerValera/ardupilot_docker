@@ -23,7 +23,7 @@ sudo docker run -it --privileged --ipc=host --net=host \
 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 -v ~/.Xauthority:/home/sim/.Xauthority \
 -v ./:/home/sim/ardupilot_docker:rw \
--e DISPLAY=$DISPLAY -p 14570:14570/udp --name=ardupilot ardupilot_docker-drone_sim:latest bash
+-e DISPLAY=$DISPLAY -p 14570:14570/udp --name=ardupilot ardupilot_docker_drone_sim :latest bash
 ```
 
 

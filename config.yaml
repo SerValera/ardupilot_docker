@@ -1,3 +1,6 @@
 DATA_SET_TO_RECORD_PATH: "/home/sim/ardupilot_docker/droneVLA_dataset"
+BACKGROUND_PATH: "/home/sim/ardupilot_docker/droneVLA_dataset/Backgrounds"
+BACKGROUND: "build" # build, city, forest, supermarket, warehouse
 CATEGORY: "Reasoning"
-TYPE: "Digits"
+TYPE: "math_desk"
+IS_MATH: True
