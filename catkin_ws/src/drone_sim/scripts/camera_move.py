@@ -37,6 +37,43 @@ class SpawnerCamera:
         self.writer_file = None
         rospy.Subscriber("/camera_1/image_raw_1", Image, self.image_callback) # main for data recording
 
+    def quaternion_to_yaw_pitch_roll(self, q0, q1, q2, q3):
+        # Roll (rotation around x-axis)
+        sinr_cosp = 2 * (q0 * q1 + q2 * q3)
+        cosr_cosp = 1 - 2 * (q1 * q1 + q2 * q2)
+        roll = math.atan2(sinr_cosp, cosr_cosp)
+
+        # Pitch (rotation around y-axis)
+        sinp = 2 * (q0 * q2 - q3 * q1)
+        if abs(sinp) >= 1:
+            pitch = math.copysign(math.pi / 2, sinp)  # use 90 degrees if out of range
+        else:
+            pitch = math.asin(sinp)
+
+        # Yaw (rotation around z-axis)
+        siny_cosp = 2 * (q0 * q3 + q1 * q2)
+        cosy_cosp = 1 - 2 * (q2 * q2 + q3 * q3)
+        yaw = math.atan2(siny_cosp, cosy_cosp)
+
+        return yaw, pitch, roll
+
+    def get_normalized_vector(self, point1, point2):
+        vector = np.array(point2) - np.array(point1)
+        norm = np.linalg.norm(vector)
+        if norm == 0:
+            raise ValueError("The points are the same, no direction vector.")
+        normalized_vector = vector / norm
+        return normalized_vector
+
+
+    # Function to rotate the velocity vector in the XY plane
+    def rotate_velocity_xy(self, vx, vy, delta_yaw):
+        cos_yaw = np.cos(delta_yaw)
+        sin_yaw = np.sin(delta_yaw)
+        vx_rot = vx * cos_yaw - vy * sin_yaw
+        vy_rot = vx * sin_yaw + vy * cos_yaw
+        return vx_rot, vy_rot
+
     def create_folder(self):
         " Create folder to store data set "
         if not os.path.exists(self.folder):
@@ -103,17 +140,19 @@ class SpawnerCamera:
             orientation_noise_range = 0.0  # Максимальный шум для ориентации (0.1 рад)
 
             # Начинаем движение по траектории
-            for i in range(len(x_vals)-1):
+            step = 3
+            setp_loop = step + 2
+            for i in range(len(x_vals)-setp_loop):
                 # Позиция на текущем шаге с шумом
                 x = x_vals[i] + random.uniform(-position_noise_range, position_noise_range)
                 y = y_vals[i] + random.uniform(-position_noise_range, position_noise_range)
                 z = z_vals[i] + random.uniform(-position_noise_range, position_noise_range)
 
                 # Рассчитаем углы для ориентации
-                dx = x_vals[i] - x_vals[i+1]
-                dy = y_vals[1] - y_vals[1+1]
-                dz = z_vals[i] - z_vals[i+1]
-                angle = np.arctan2(dy, -dx)  # угол для ориентации
+                dx = x_vals[i] - x_vals[i+step]
+                dy = y_vals[i] - y_vals[i+step]
+                dz = z_vals[i] - z_vals[i+step]
+                angle = np.arctan2(-dy, -dx)  # угол для ориентации
                     
                 # Ориентация с шумом
                 noise_roll = random.uniform(-orientation_noise_range, orientation_noise_range)
@@ -124,7 +163,7 @@ class SpawnerCamera:
                 noisy_angle = angle + noise_yaw
                 
                 # Преобразуем шум и угол в кватернион
-                quat = quaternion_from_euler(noise_roll, noise_pitch, noisy_angle * 5)
+                quat = quaternion_from_euler(noise_roll, noise_pitch, noisy_angle)
                 
                 # Создание сообщения о состоянии модели
                 state_msg = ModelState()
@@ -136,15 +175,55 @@ class SpawnerCamera:
                 state_msg.pose.orientation.y = quat[1]
                 state_msg.pose.orientation.z = quat[2]
                 state_msg.pose.orientation.w = quat[3]
-                
+
                 # Отправка команды в Gazebo
                 self.set_state(state_msg)
+                
+                """ The vector is directed towards the gate """
+                # Current orientation
+                # dx_next = x_vals[i+step] - x_vals[i+step + 1]
+                # dy_next = y_vals[i+step] - y_vals[i+step + 1]
+                # angle_next = np.arctan2(-dy_next, -dx_next)  # угол для ориентации
+                # delta_yaw = angle_next - angle
+
+                # if abs(delta_yaw) > np.pi/2:
+                #     continue  # Skip this row if the condition is met
+
+                # # Rotation matrix for yaw angle (2D rotation, assuming yaw is in radians)
+                # cos_yaw = np.cos(angle)
+                # sin_yaw = np.sin(angle)
+
+                # # Rotate the velocity vector into the local frame
+                # local_velocity_x = cos_yaw * dx + sin_yaw * dy
+                # local_velocity_y = -sin_yaw * dx + cos_yaw * dy
+                # local_velocity_z = dz  # Assuming no rotation for the z-axis
+                """ --- """
+
+                """ The vector is directed towards the gate """
+                    # Current orientation
+                dx_next = x_vals[i+step] - goal_pose[0]
+                dy_next = y_vals[i+step] - goal_pose[1]
+                angle_next = np.arctan2(-dy_next, -dx_next)  # угол для ориентации
+                delta_yaw = angle_next - angle
+
+                if abs(delta_yaw) > np.pi/2:
+                    continue  # Skip this row if the condition is met
+
+                # Rotation matrix for yaw angle (2D rotation, assuming yaw is in radians)
+                cos_yaw = np.cos(angle)
+                sin_yaw = np.sin(angle)
+
+                # Rotate the velocity vector into the local frame
+                local_velocity_x = cos_yaw * dx + sin_yaw * dy
+                local_velocity_y = -sin_yaw * dx + cos_yaw * dy
+                local_velocity_z = dz  # Assuming no rotation for the z-axis
+                """ --- """
 
                 # Save trajectories
                 if self.frame_id > 0: #FIXME: if frame id == 0 image came from last of the previuse flight.
                     with open(self.folder + 'data.csv', 'a', newline='') as file:
                         self.writer_file = csv.writer(file)
-                        self.writer_file.writerow([self.frame_id,dx,dy,dz,angle,x,y,z,angle,quat[0],quat[1],quat[2],quat[3]])
+                        self.writer_file.writerow([self.frame_id,local_velocity_x,local_velocity_y,local_velocity_z,delta_yaw,x,y,z,quat[0],quat[1],quat[2],quat[3]])
 
                     # Save images
                     self.save_image('image_'+str(self.frame_id)+'.jpg')

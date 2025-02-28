@@ -1,1 +1,0 @@
-prompt,options,correct,gates,background

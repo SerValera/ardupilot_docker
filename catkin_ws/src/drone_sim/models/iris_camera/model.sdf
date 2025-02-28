@@ -41,17 +41,17 @@
           <noise>
             <type>gaussian</type>
             <mean>0.0</mean>
-            <stddev>0.25</stddev>
+            <stddev>0.001</stddev>
           </noise>
-          <horizontal_fov>2.2</horizontal_fov>
+          <horizontal_fov>1.85</horizontal_fov>
           <image>
-            <width>1024</width>
-            <height>768</height>
+            <width>256</width>
+            <height>256</height>
             <format>R8G8B8</format>
           </image>
           <clip>
             <near>0.02</near>
-            <far>300</far>
+            <far>600</far>
           </clip>
         </camera>
         <plugin name="camera_controller" filename="libgazebo_ros_depth_camera.so">

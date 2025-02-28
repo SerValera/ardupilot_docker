@@ -87,4 +87,4 @@ RUN echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
 # Add terminal commands
 RUN echo "alias copy_realsense_plugin='sudo cp /home/sim/ardupilot_docker/gazebo-realsense/gzrs/RealSensePlugin.hh /usr/include/gazebo-11/gazebo/plugins/'" >> ~/.bashrc && \
     echo "alias run='roslaunch drone_sim launch_world.launch'" >> ~/.bashrc && \
-    echo "alias rec='rosrun drone_sim spawn_model.py'" >> ~/.bashrc
+    echo "alias rec='roslaunch drone_sim record.launch'" >> ~/.bashrc

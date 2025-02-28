@@ -8,7 +8,7 @@ from gazebo_msgs.msg import ModelState
 from geometry_msgs.msg import Pose
 import tf.transformations as tf
 
-d_time = 0.125 #before rotation sleep
+d_time = 0.15 #before rotation sleep
 
 class SpawnerGates:
     def __init__(self, path, pose=[-5, 5]):
@@ -17,7 +17,7 @@ class SpawnerGates:
         self.folder_path = path
 
         for k in range(3):
-            self.spawn_gates_in_gazebo(k, init_x=pose[0]-5*k, init_y=pose[1], init_z=1)
+            self.spawn_gates_in_gazebo(k, init_x=pose[0]-5*k, init_y=pose[1], init_z=-3)
 
         self.spawned_scene_models = []
 

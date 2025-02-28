@@ -39,6 +39,8 @@ class SpawnerModels:
 
         self.read_setup_scene()
 
+        self.count = 1
+
     def read_setup_scene(self):
         self.setup_gates = []
         with open(CSV_FILE, "r") as file:
@@ -110,6 +112,8 @@ class SpawnerModels:
 
         file_path = DATA_SET_TO_RECORD_PATH + "/" + cat + "/" + type + ".json"
 
+        print("file_path", file_path)
+
         def extract_all_data(data):
             """Extracts and stores all data for each prompt."""
             extracted_data = []
@@ -120,6 +124,7 @@ class SpawnerModels:
                 ]
                 extracted_data.append({
                     "prompt": item["prompt"],
+                    "prompt_simpler": item["prompt_simpler"],
                     "options": item["options"],
                     "correct": item["correct"],
                     "gates": gates_info,
@@ -189,6 +194,7 @@ class SpawnerModels:
         self.read_json_file(cat, type)
 
         for setup in self.json_data:
+            print("Total: " + str(self.count) + " of " + str(len(self.json_data)))
             objects_poses = []
 
             # Uptade gates
@@ -197,10 +203,10 @@ class SpawnerModels:
                 id = int(gate["gate"]) - 1
 
                 if id + 1 == int(setup["correct"]):
-                    objects_poses.append([self.setup_gates[id][1], self.setup_gates[id][2]])
+                    objects_poses.append([self.setup_gates[id][1], self.setup_gates[id][2], self.setup_gates[id][3]])
                     
                 CGates.move_gate_by_attributes(id, gate["size"], gate["color"], gate["shape"], self.setup_gates[id][1], self.setup_gates[id][2], self.setup_gates[id][3], self.setup_gates[id][4], self.setup_gates[id][5], self.setup_gates[id][6])
-                rospy.sleep(0.1)
+                rospy.sleep(0.15)
 
             # Update SDF labels for new task
             path_to_models = [
@@ -212,9 +218,9 @@ class SpawnerModels:
             self.update_sdf_file(path_to_files, setup["options"], path_to_models)
 
             # Spawn models in gazebo, remove previous
-            rospy.sleep(0.2)
+            rospy.sleep(0.25)
             self.load_lables()
-            rospy.sleep(0.05)
+            rospy.sleep(0.1)
 
             # Move camera and record
             CCamera.goal_poses = objects_poses
@@ -222,6 +228,8 @@ class SpawnerModels:
 
             # Move gate to its init poses
             CGates.move_gate_back()
+
+            self.count += 1
 
         self.delete_existing_models()  # Clear previous scene
 
@@ -234,7 +242,7 @@ class SpawnerModels:
                 if row["model_name"] == "label":
                     model_name, id, x, y, z, roll, pitch, yaw = row["model_name"], int(row["id"]), float(row["x"]), float(row["y"]), float(row["z"]), float(row["roll"]), float(row["pitch"]), float(row["yaw"])
                     self.spawn_model(id, model_name + "_" + row["id"], x, y, z)
-                    rospy.sleep(0.2)
+                    rospy.sleep(0.25)
                     self.rotate_model(id, model_name, roll, pitch, yaw)
 
 
@@ -250,7 +258,7 @@ class SpawnerModels:
                     if model_name != "label":
                         objects_poses.append([x, y])
                     self.spawn_model(id, model_name, x, y, z)
-                    rospy.sleep(0.1)
+                    rospy.sleep(0.15)
                     self.rotate_model(id, model_name, roll, pitch, yaw)
 
         return objects_poses
