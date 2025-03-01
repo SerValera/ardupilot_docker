@@ -125,8 +125,8 @@ def create_video(csv_file, images_path, output_video_path):
 
 # Run the script
 if __name__ == '__main__':
-    folder_data = "2025-02-27 14:01:48.635174"
-    folder = "/home/sim/ardupilot_docker/recorded_dataset/Reasoning/Digits/" + folder_data
+    folder_data = "2025-02-28 16:28:24.273521"
+    folder = "/home/sim/ardupilot_docker/recorded_dataset/Patterns/" + folder_data
     csv_file = folder + '/data.csv'  # Your CSV file path
     images_path = folder + "/images"
     output_video_path = folder + '/output_video.mp4'

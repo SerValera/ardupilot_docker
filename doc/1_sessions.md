@@ -10,7 +10,7 @@ docker exec -it ardupilot bash
 In first terminal launch: (first run will take a few seconds)
 
 ```sh
-roslaunch drone_sim launch_world.launch 
+roslaunch drone_sim launch_world_drone.launch 
 ```
 
 In second terminal window, enter the ArduCopter directory and start the SITL simulation (It will do compilation in first launch):

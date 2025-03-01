@@ -14,6 +14,7 @@ import tf.transformations as tf
 
 from camera_move import SpawnerCamera
 from gates_move import SpawnerGates
+from camera_move_bench import BenchCamera
 
 
 # TO FILL BY USER
@@ -130,7 +131,6 @@ class SpawnerModels:
                 ]
                 extracted_data.append({
                     "prompt": item["prompt"],
-                    "task": item["task"],
                     "prompt_simpler": item["prompt_simpler"],
                     "options": item["options"],
                     "correct": item["correct"],
@@ -230,7 +230,6 @@ class SpawnerModels:
             rospy.sleep(0.1)
 
             print(setup)
-            print(setup["task"])
             if IS_MATH:
                 path_to_math_models = [
                     "/home/sim/ardupilot_docker/catkin_ws/src/drone_sim/models/math_1/model.sdf",
@@ -241,9 +240,9 @@ class SpawnerModels:
                 self.update_sdf_math_file(path_to_files, setup["task"], path_to_math_models)
 
                         # Spawn models in gazebo, remove previous
-            rospy.sleep(0.25)
-            self.load_math()
-            rospy.sleep(0.1)
+                rospy.sleep(0.5)
+                self.load_math()
+                rospy.sleep(0.1)
 
             # Move camera and record
             CCamera.goal_poses = objects_poses
@@ -260,7 +259,7 @@ class SpawnerModels:
             # Move gate to its init poses
             CGates.move_gate_back()
 
-        self.count += 1
+            self.count += 1
 
         self.delete_existing_models()  # Clear previous scene
 
@@ -310,10 +309,16 @@ if __name__ == "__main__":
     # Prepare scene and gazebo
     spawn = SpawnerModels()
     Ccamera = SpawnerCamera(init_point=spawn.init_pose)
+
+    CBench = BenchCamera(init_point=spawn.init_pose)
+
     CGates = SpawnerGates(path=MODELS_PATH, bg_path=BACKGROUND_PATH, pose=[-5, 5])
 
     # Read task list (jsons) for data recording
-    spawn.recording_json(CGates, Ccamera, CATEGORY, TYPE)
+    # spawn.recording_json(CGates, Ccamera, CATEGORY, TYPE)
+
+    spawn.recording_json(CGates, CBench, CATEGORY, TYPE)
+    
 
 
 

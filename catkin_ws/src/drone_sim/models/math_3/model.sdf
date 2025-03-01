@@ -7,7 +7,7 @@
       <visual name='vis_label'>
         <geometry>
           <mesh>
-            <uri>/home/sim/ardupilot_docker/math/1.dae</uri>
+            <uri>/home/sim/ardupilot_docker/math/3.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
@@ -15,7 +15,7 @@
       <collision name='col_label'>
         <geometry>
           <mesh>
-            <uri>/home/sim/ardupilot_docker/math/1.dae</uri>
+            <uri>/home/sim/ardupilot_docker/math/3.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>

@@ -82,6 +82,7 @@ class SpawnerGates:
 
         try:
             set_model_state_srv(state)
+            rospy.sleep(0.5)
             rospy.loginfo(f"Moved {model_name} to new pose")
         except rospy.ServiceException as e:
             rospy.logerr(f"Failed to move model {model_name}: {e}")
